@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Multi-Region AWS Lab — Terraform on LocalStack",
+    "output": "architecture-diagram.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "failover-path", "label": "DNS failover path", "focus": ["route53", "alb_east", "alb_west"], "note": "Route 53 sends traffic to the lowest-latency healthy region." },
+      { "id": "east-region", "label": "Primary region (us-east-1)", "focus": ["igw_east", "nat_east", "alb_east", "asg_east"], "note": "Full public/private path inside the primary VPC." },
+      { "id": "lab-emulation", "label": "Lab emulation layer", "focus": ["localstack", "s3backend"], "note": "Every AWS API call in this lab is served by LocalStack, not real AWS." }
+    ]
+  },
+  "components": [
+    { "id": "route53", "type": "cloud", "label": "Route 53", "sublabel": "app.lab.local", "tag": "latency routing", "pos": [545, 16], "size": [190, 60] },
+
+    { "id": "alb_east", "type": "cloud", "label": "ALB", "sublabel": "public subnets", "pos": [140, 170], "size": [150, 56] },
+    { "id": "asg_east", "type": "backend", "label": "ASG · EC2", "sublabel": "Ubuntu 22.04 + Nginx", "tag": "min 2 / max 4", "pos": [140, 320], "size": [170, 60] },
+    { "id": "nat_east", "type": "cloud", "label": "NAT Gateway", "sublabel": "public subnet", "pos": [360, 170], "size": [150, 56] },
+    { "id": "igw_east", "type": "cloud", "label": "Internet Gateway", "sublabel": "us-east-1", "pos": [360, 66], "size": [150, 56] },
+
+    { "id": "alb_west", "type": "cloud", "label": "ALB", "sublabel": "public subnets", "pos": [940, 170], "size": [150, 56] },
+    { "id": "asg_west", "type": "backend", "label": "ASG · EC2", "sublabel": "Ubuntu 22.04 + Nginx", "tag": "min 2 / max 4", "pos": [940, 320], "size": [170, 60] },
+    { "id": "nat_west", "type": "cloud", "label": "NAT Gateway", "sublabel": "public subnet", "pos": [1160, 170], "size": [150, 56] },
+    { "id": "igw_west", "type": "cloud", "label": "Internet Gateway", "sublabel": "us-west-2", "pos": [1160, 66], "size": [150, 56] },
+
+    { "id": "s3backend", "type": "database", "label": "Terraform Backend", "sublabel": "S3 bucket: infra-multiregion", "pos": [430, 440], "size": [200, 60] },
+    { "id": "localstack", "type": "external", "label": "LocalStack", "sublabel": "192.168.1.101:4566", "tag": "AWS API emulation", "pos": [780, 440], "size": [200, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "VPC us-east-1 · 10.0.0.0/16", "wraps": ["igw_east", "nat_east", "alb_east", "asg_east"] },
+    { "kind": "region", "label": "VPC us-west-2 · 10.0.0.0/16", "wraps": ["igw_west", "nat_west", "alb_west", "asg_west"] },
+    { "kind": "security-group", "label": "sg-alb · 80/443 from 0.0.0.0/0", "wraps": ["alb_east"] },
+    { "kind": "security-group", "label": "sg-instance · 80 from sg-alb", "wraps": ["asg_east"] },
+    { "kind": "security-group", "label": "sg-alb · 80/443 from 0.0.0.0/0", "wraps": ["alb_west"] },
+    { "kind": "security-group", "label": "sg-instance · 80 from sg-alb", "wraps": ["asg_west"] }
+  ],
+  "connections": [
+    { "id": "dns-to-east", "from": "route53", "to": "alb_east", "label": "latency + health check", "variant": "emphasis", "fromSide": "left", "toSide": "top" },
+    { "id": "dns-to-west", "from": "route53", "to": "alb_west", "label": "latency + health check", "variant": "emphasis", "fromSide": "right", "toSide": "top" },
+    { "id": "nat-to-igw-east", "from": "nat_east", "to": "igw_east", "label": "egress 0.0.0.0/0", "fromSide": "top", "toSide": "bottom" },
+    { "id": "alb-to-asg-east", "from": "alb_east", "to": "asg_east", "label": "HTTP :80", "fromSide": "bottom", "toSide": "top" },
+    { "id": "nat-to-igw-west", "from": "nat_west", "to": "igw_west", "label": "egress 0.0.0.0/0", "fromSide": "top", "toSide": "bottom" },
+    { "id": "alb-to-asg-west", "from": "alb_west", "to": "asg_west", "label": "HTTP :80", "fromSide": "bottom", "toSide": "top" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Global layer", "items": ["Route 53 latency-based routing between both regions", "Per-region HTTP health check (failure_threshold = 3) drives automatic failover"] },
+    { "dot": "emerald", "title": "Per-region stack", "items": ["Public + private subnets across 2 AZs", "ALB in public subnets → ASG (2–4 EC2) in private subnets", "NAT Gateway gives private instances outbound-only internet access"] },
+    { "dot": "rose", "title": "Security", "items": ["sg-alb: only 80/443 open to the internet", "sg-instance: only reachable from sg-alb, never directly"] },
+    { "dot": "amber", "title": "Lab, not production", "items": ["Every AWS API (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) is emulated by LocalStack", "Terraform state itself lives in a LocalStack-backed S3 bucket"] }
+  ]
+}
