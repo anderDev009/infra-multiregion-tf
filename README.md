@@ -1,5 +1,18 @@
 # 🌎 Multi-Region AWS Lab — Terraform on LocalStack
 
+<p>
+  <img alt="Terraform" src="https://img.shields.io/badge/Terraform-%3E%3D1.5-7B42BC?style=for-the-badge&logo=terraform&logoColor=white">
+  <img alt="AWS Provider" src="https://img.shields.io/badge/AWS%20Provider-%7E%3E%206.0-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white">
+  <img alt="LocalStack" src="https://img.shields.io/badge/LocalStack-emulated-4285F4?style=for-the-badge&logo=localstack&logoColor=white">
+  <img alt="Regions" src="https://img.shields.io/badge/Regions-us--east--1%20%7C%20us--west--2-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
+</p>
+<p>
+  <img alt="Nginx" src="https://img.shields.io/badge/Nginx-EC2%20workload-009639?style=for-the-badge&logo=nginx&logoColor=white">
+  <img alt="Ubuntu" src="https://img.shields.io/badge/Ubuntu-22.04%20Jammy-E95420?style=for-the-badge&logo=ubuntu&logoColor=white">
+  <img alt="Route53" src="https://img.shields.io/badge/Route%2053-latency%20routing-8C4FFF?style=for-the-badge&logo=amazonroute53&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/status-lab%20%2F%20not%20production-red?style=for-the-badge">
+</p>
+
 Infraestructura como código que despliega un stack **activo-activo en dos regiones** (`us-east-1` y `us-west-2`), con failover automático vía DNS, corriendo íntegramente contra **LocalStack** como laboratorio de práctica de Terraform + arquitectura multi-región.
 
 > ⚠️ **Esto NO es AWS real.** Todos los providers apuntan a un endpoint local de LocalStack (`http://192.168.1.101:4566`). Es un entorno de laboratorio pensado para practicar patrones de alta disponibilidad sin gastar un centavo en AWS.
