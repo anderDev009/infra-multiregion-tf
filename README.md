@@ -15,24 +15,24 @@
 
 Infraestructura como código que despliega un stack **activo-activo en dos regiones** (`us-east-1` y `us-west-2`), con failover automático vía DNS, corriendo íntegramente contra **Floci** como laboratorio de práctica de Terraform + arquitectura multi-región.
 
-> ⚠️ **Esto NO es AWS real.** Todos los providers apuntan a un endpoint local de [**Floci**](https://floci.io/) (`http://192.168.1.101:4566`) — un emulador de AWS open-source (MIT), *drop-in replacement* de LocalStack, mismo puerto y misma configuración de provider. Es un entorno de laboratorio pensado para practicar patrones de alta disponibilidad sin gastar un centavo en AWS.
+>  **Esto NO es AWS real.** Todos los providers apuntan a un endpoint local de [**Floci**](https://floci.io/) (`http://192.168.1.101:4566`) — un emulador de AWS open-source (MIT), *drop-in replacement* de LocalStack, mismo puerto y misma configuración de provider. Es un entorno de laboratorio pensado para practicar patrones de alta disponibilidad sin gastar un centavo en AWS.
 
 ---
 
-## 🧱 Stack tecnológico
+##  Stack tecnológico
 
 | Tecnología | Uso en este proyecto |
 |---|---|
 | ![Terraform](https://cdn.simpleicons.org/terraform/7B42BC) **Terraform** | IaC declarativo, módulos reutilizables, backend remoto S3 |
 | ![AWS](https://cdn.simpleicons.org/amazonaws/FF9900) **AWS Provider (`~> 6.0`)** | VPC, ALB, Auto Scaling, Route 53 — emulado por Floci |
-| 🟢 **[Floci](https://floci.io/)** | Emulación local de la API de AWS (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) — *drop-in replacement* open-source (MIT) de LocalStack |
+|  **[Floci](https://floci.io/)** | Emulación local de la API de AWS (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) — *drop-in replacement* open-source (MIT) de LocalStack |
 | ![Ubuntu](https://cdn.simpleicons.org/ubuntu/E95420) **Ubuntu 22.04 (Jammy)** | AMI base de las instancias EC2 |
 | ![Nginx](https://cdn.simpleicons.org/nginx/009639) **Nginx** | Servidor web de prueba, instalado vía `user_data` |
 | ![Amazon S3](https://cdn.simpleicons.org/amazons3/569A31) **S3** | Backend remoto de estado de Terraform |
 
 ---
 
-## 🏗️ Arquitectura
+##  Arquitectura
 
 El diagrama completo está en [`docs/architecture-diagram.html`](docs/architecture-diagram.html) — es un HTML interactivo standalone (zoom, temas claro/oscuro, vistas guiadas), no una imagen estática. Abrilo directo en el navegador.
 
@@ -89,7 +89,7 @@ El diagrama completo está en [`docs/architecture-diagram.html`](docs/architectu
 
 ---
 
-## 🚀 Uso
+##  Uso
 
 Requiere Floci corriendo y accesible en `192.168.1.101:4566`.
 
@@ -99,7 +99,7 @@ terraform plan
 terraform apply
 ```
 
-## 📝 Notas
+##  Notas
 
 - `avaliability_zones` está mal escrito a propósito de origen (typo heredado en variables/módulos) — se mantiene así para no romper referencias internas del módulo.
 - El backend S3 usa credenciales dummy (`test`/`test`) porque Floci no valida credenciales reales.
