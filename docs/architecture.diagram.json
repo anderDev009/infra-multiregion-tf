@@ -2,13 +2,13 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "Multi-Region AWS Lab — Terraform on LocalStack",
+    "title": "Multi-Region AWS Lab — Terraform on Floci",
     "output": "architecture-diagram.html",
     "quality_profile": "showcase",
     "views": [
       { "id": "failover-path", "label": "DNS failover path", "focus": ["route53", "alb_east", "alb_west"], "note": "Route 53 sends traffic to the lowest-latency healthy region." },
       { "id": "east-region", "label": "Primary region (us-east-1)", "focus": ["igw_east", "nat_east", "alb_east", "asg_east"], "note": "Full public/private path inside the primary VPC." },
-      { "id": "lab-emulation", "label": "Lab emulation layer", "focus": ["localstack", "s3backend"], "note": "Every AWS API call in this lab is served by LocalStack, not real AWS." }
+      { "id": "lab-emulation", "label": "Lab emulation layer", "focus": ["floci", "s3backend"], "note": "Every AWS API call in this lab is served by Floci, not real AWS." }
     ]
   },
   "components": [
@@ -25,7 +25,7 @@
     { "id": "igw_west", "type": "cloud", "label": "Internet Gateway", "sublabel": "us-west-2", "pos": [1160, 66], "size": [150, 56] },
 
     { "id": "s3backend", "type": "database", "label": "Terraform Backend", "sublabel": "S3 bucket: infra-multiregion", "pos": [430, 440], "size": [200, 60] },
-    { "id": "localstack", "type": "external", "label": "LocalStack", "sublabel": "192.168.1.101:4566", "tag": "AWS API emulation", "pos": [780, 440], "size": [200, 60] }
+    { "id": "floci", "type": "external", "label": "Floci", "sublabel": "192.168.1.101:4566", "tag": "AWS API emulation", "pos": [780, 440], "size": [200, 60] }
   ],
   "boundaries": [
     { "kind": "region", "label": "VPC us-east-1 · 10.0.0.0/16", "wraps": ["igw_east", "nat_east", "alb_east", "asg_east"] },
@@ -47,6 +47,6 @@
     { "dot": "cyan", "title": "Global layer", "items": ["Route 53 latency-based routing between both regions", "Per-region HTTP health check (failure_threshold = 3) drives automatic failover"] },
     { "dot": "emerald", "title": "Per-region stack", "items": ["Public + private subnets across 2 AZs", "ALB in public subnets → ASG (2–4 EC2) in private subnets", "NAT Gateway gives private instances outbound-only internet access"] },
     { "dot": "rose", "title": "Security", "items": ["sg-alb: only 80/443 open to the internet", "sg-instance: only reachable from sg-alb, never directly"] },
-    { "dot": "amber", "title": "Lab, not production", "items": ["Every AWS API (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) is emulated by LocalStack", "Terraform state itself lives in a LocalStack-backed S3 bucket"] }
+    { "dot": "amber", "title": "Lab, not production", "items": ["Every AWS API (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) is emulated by Floci", "Terraform state itself lives in a Floci-backed S3 bucket"] }
   ]
 }

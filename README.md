@@ -1,9 +1,9 @@
-# 🌎 Multi-Region AWS Lab — Terraform on LocalStack
+# 🌎 Multi-Region AWS Lab — Terraform on Floci
 
 <p>
   <img alt="Terraform" src="https://img.shields.io/badge/Terraform-%3E%3D1.5-7B42BC?style=for-the-badge&logo=terraform&logoColor=white">
   <img alt="AWS Provider" src="https://img.shields.io/badge/AWS%20Provider-%7E%3E%206.0-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white">
-  <img alt="LocalStack" src="https://img.shields.io/badge/LocalStack-emulated-4285F4?style=for-the-badge&logo=localstack&logoColor=white">
+  <img alt="Floci" src="https://img.shields.io/badge/Floci-AWS%20emulation-2EA043?style=for-the-badge&logo=amazonwebservices&logoColor=white">
   <img alt="Regions" src="https://img.shields.io/badge/Regions-us--east--1%20%7C%20us--west--2-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
 </p>
 <p>
@@ -13,9 +13,9 @@
   <img alt="License" src="https://img.shields.io/badge/status-lab%20%2F%20not%20production-red?style=for-the-badge">
 </p>
 
-Infraestructura como código que despliega un stack **activo-activo en dos regiones** (`us-east-1` y `us-west-2`), con failover automático vía DNS, corriendo íntegramente contra **LocalStack** como laboratorio de práctica de Terraform + arquitectura multi-región.
+Infraestructura como código que despliega un stack **activo-activo en dos regiones** (`us-east-1` y `us-west-2`), con failover automático vía DNS, corriendo íntegramente contra **Floci** como laboratorio de práctica de Terraform + arquitectura multi-región.
 
-> ⚠️ **Esto NO es AWS real.** Todos los providers apuntan a un endpoint local de LocalStack (`http://192.168.1.101:4566`). Es un entorno de laboratorio pensado para practicar patrones de alta disponibilidad sin gastar un centavo en AWS.
+> ⚠️ **Esto NO es AWS real.** Todos los providers apuntan a un endpoint local de [**Floci**](https://floci.io/) (`http://192.168.1.101:4566`) — un emulador de AWS open-source (MIT), *drop-in replacement* de LocalStack, mismo puerto y misma configuración de provider. Es un entorno de laboratorio pensado para practicar patrones de alta disponibilidad sin gastar un centavo en AWS.
 
 ---
 
@@ -24,8 +24,8 @@ Infraestructura como código que despliega un stack **activo-activo en dos regio
 | Tecnología | Uso en este proyecto |
 |---|---|
 | ![Terraform](https://cdn.simpleicons.org/terraform/7B42BC) **Terraform** | IaC declarativo, módulos reutilizables, backend remoto S3 |
-| ![AWS](https://cdn.simpleicons.org/amazonaws/FF9900) **AWS Provider (`~> 6.0`)** | VPC, ALB, Auto Scaling, Route 53 — emulado por LocalStack |
-| ![LocalStack](https://cdn.simpleicons.org/localstack/4285F4) **LocalStack** | Emulación local de la API de AWS (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) |
+| ![AWS](https://cdn.simpleicons.org/amazonaws/FF9900) **AWS Provider (`~> 6.0`)** | VPC, ALB, Auto Scaling, Route 53 — emulado por Floci |
+| 🟢 **[Floci](https://floci.io/)** | Emulación local de la API de AWS (EC2, ELBv2, Route 53, ASG, S3, IAM, STS) — *drop-in replacement* open-source (MIT) de LocalStack |
 | ![Ubuntu](https://cdn.simpleicons.org/ubuntu/E95420) **Ubuntu 22.04 (Jammy)** | AMI base de las instancias EC2 |
 | ![Nginx](https://cdn.simpleicons.org/nginx/009639) **Nginx** | Servidor web de prueba, instalado vía `user_data` |
 | ![Amazon S3](https://cdn.simpleicons.org/amazons3/569A31) **S3** | Backend remoto de estado de Terraform |
@@ -67,7 +67,7 @@ El diagrama completo está en [`docs/architecture-diagram.html`](docs/architectu
 
 - **Route 53** con **latency-based routing** entre ambas regiones.
 - **Health checks HTTP** por región (`failure_threshold = 3`) que sacan de servicio automáticamente la región caída.
-- **Backend de estado remoto** en un bucket S3 (`infra-multiregion`), también servido por LocalStack.
+- **Backend de estado remoto** en un bucket S3 (`infra-multiregion`), también servido por Floci.
 
 ---
 
@@ -76,8 +76,8 @@ El diagrama completo está en [`docs/architecture-diagram.html`](docs/architectu
 ```
 .
 ├── main.tf                    # orquesta ambas regiones + módulo DNS
-├── providers.tf                # providers aws.primary / aws.secondary → LocalStack
-├── backend.tf                  # backend S3 remoto (LocalStack)
+├── providers.tf                # providers aws.primary / aws.secondary → Floci
+├── backend.tf                  # backend S3 remoto (Floci)
 ├── variables.tf
 ├── docs/
 │   ├── architecture-diagram.html   # diagrama interactivo (generado con IA)
@@ -91,7 +91,7 @@ El diagrama completo está en [`docs/architecture-diagram.html`](docs/architectu
 
 ## 🚀 Uso
 
-Requiere LocalStack corriendo y accesible en `192.168.1.101:4566`.
+Requiere Floci corriendo y accesible en `192.168.1.101:4566`.
 
 ```bash
 terraform init
@@ -102,4 +102,4 @@ terraform apply
 ## 📝 Notas
 
 - `avaliability_zones` está mal escrito a propósito de origen (typo heredado en variables/módulos) — se mantiene así para no romper referencias internas del módulo.
-- El backend S3 usa credenciales dummy (`test`/`test`) porque LocalStack no valida credenciales reales.
+- El backend S3 usa credenciales dummy (`test`/`test`) porque Floci no valida credenciales reales.
