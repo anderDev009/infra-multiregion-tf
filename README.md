@@ -1,4 +1,4 @@
-# 🌎 Multi-Region AWS Lab — Terraform on Floci
+#  Multi-Region AWS Lab — Terraform on Floci
 
 <p>
   <img alt="Terraform" src="https://img.shields.io/badge/Terraform-%3E%3D1.5-7B42BC?style=for-the-badge&logo=terraform&logoColor=white">
